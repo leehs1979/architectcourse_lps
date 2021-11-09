@@ -4,8 +4,9 @@ import psutil
 
 print("paramiko")
 
-# Set properties
-host = "172.16.1.108"
+# Set properties : LPSClient에서 실행해야 함
+# LPS 서버정보
+host = "172.16.1.106"
 port = 22
 
 id = 'app'
@@ -15,8 +16,8 @@ pwd = 'citec!00'
 localpath = "/home/app/"
 remotepath = "/home/app/"
 
-filename = "LPS_Client.tar"
-filename = "HOM1-W-F11.log.gz"
+filename = "HOM1-W-F11_1GB.log"
+#filename = "HOM1-W-F11.log.gz"
 
 paramiko.util.log_to_file(localpath+'sftp.log')
 
