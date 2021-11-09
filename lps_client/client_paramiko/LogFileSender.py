@@ -14,7 +14,7 @@ id = 'app'
 pwd = 'citec!00'
 
 localpath = "/app/"
-remotepath = "/app/home/"
+remotepath = "/home/app/"
 
 filename = "HOM1-W-F11_1GB.log"
 #filename = "HOM1-W-F11.log.gz"
