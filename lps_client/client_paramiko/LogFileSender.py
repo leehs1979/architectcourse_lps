@@ -13,8 +13,8 @@ id = 'app'
 #id = 'root'
 pwd = 'citec!00'
 
-localpath = "/home/app/"
-remotepath = "/home/app/"
+localpath = "/app/"
+remotepath = "/app/home/"
 
 filename = "HOM1-W-F11_1GB.log"
 #filename = "HOM1-W-F11.log.gz"
@@ -27,6 +27,7 @@ psutil.cpu_percent()
 #psutil.virtual_memory().percent
 #psutil.virtual_memory().available * 100 / psutil.virtual_memory().total
 
+print('CPU % used:', psutil.cpu_percent())
 print('memory % used:', psutil.virtual_memory()[2])
 
 try:
