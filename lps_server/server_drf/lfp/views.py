@@ -40,22 +40,23 @@ class LogFileProcessorViewSet(viewsets.ModelViewSet):
         response = {}
         
         try:
-            # TODO: 파일위치, 이름, 크기 고정
-            print('Test')
+            # 대용량 파일 파싱 테스트
+            file_path = "/home/app/"
+            file_name = file_path + "HOM1-W-F11_SampleForTest.log"
+            log_format = "%h %{X-Forwarded-For}i %l %u %v %t %r %>s %B %{Referer}i %{User-Agent}i %{JSESSIONID}C %a %{env}e %f %p %D"
             
-            parser.parse()
-
-            # TODO: 파싱
-            #resultFiles.append(self.parse_log_div(logfile.name, logfile_id, id_startnum, None, None, 0, diff_hour))
-            
-            # TODO: DB 저장 (Options)
+             # 파싱
+            print('[START] PARSE')            
+            result_filen_name = parser.parse(file_name, log_format)
+            print("[END] PARSE result: ", result_filen_name)
+           
+            # DB 저장 (Options)
             # postgresql copy 실행                
             #LogDetail_dynamic.objects.model.objects = CopyManager()
             #LogDetail_dynamic.objects.model = ModelSchema.objects.get(name=model_name).as_model()
             
             #for filename in resultFiles:
-            #    LogDetail_dynamic.objects.from_csv(filename, delimiter=',', encoding="utf-8")         
-
+            #    LogDetail_dynamic.objects.from_csv(filename, delimiter=',', encoding="utf-8")
 
             if settings.DEBUG:
                 logger.debug("To DB, Total Duration : %s sec" % (time.time() - start))
