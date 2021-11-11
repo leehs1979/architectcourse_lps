@@ -43,64 +43,67 @@ class StreamLog(faust.Record):
 class StreamLogBuffer:
 
     def __init__(self):
-        self.pending = []
+        #self.pending = []
+        self.pending = {}
         self.total = 0
 
     def flush(self):
-
+        
         self.pending.clear()
         print('TOTAL NOW: %r' % self.total)
 
-    def add(self, coord):
-        self.pending.append(coord)
+    def add(self, x_key, y_value):
+        self.pending[x_key] = y_value
         self.total += 1
         
-    def get_last_item(self):
-        if len(self.pending) > 0:
-            #print(self.pending)
-            return self.pending[-1]
-        else:
-            return None
+    def get_coords(self):
+        return self.pending
         
 buffer = StreamLogBuffer()    
 
 stream_log_topic = app.topic('lps_web1_apache', value_type=StreamLog)
 ######################################################################
 # By default the changelog topic for a given Table has the format <app_id>-<table_name>-changelogs 
-stream_log_count = app.Table('stream_log_count', default=int).tumbling(timedelta(seconds=3))
+stream_log_count = app.Table('stream_log_count', default=int).tumbling(timedelta(seconds=3)).relative_to_field(StreamLog.timestamp)#.relative_to_now()
 
 @app.agent(stream_log_topic)
 async def count_stream_log_views(logs):
     async for log in logs.group_by(StreamLog.time):
-        stream_log_count[log.time] += 1
         
-        print(log)        
-        print(stream_log_count[log.time].value())
+        stream_log_count[log.time] += 1       
         
-        stream_timestamp = datetime.fromtimestamp(log.timestamp).strftime("%Y-%m-%d %H:%M:%S")
+        #print(log)        
+        #print(stream_log_count[log.time].value())
         
-        coord_json = {                
-            'message': '(x, y) = ('+stream_timestamp+', '+ str(stream_log_count[log.time].value())+' )'
-        }
-        
-        buffer.add(coord_json)        
+        stream_timestamp = datetime.fromtimestamp(log.timestamp).strftime("%Y-%m-%d %H:%M:%S") 
+             
+        buffer.add(stream_timestamp, stream_log_count[log.time].value())        
+        #coords = buffer.get_coords()
+        #print("buffer.get_coords() : ", coords)
         
 @app.timer(interval=3.0)
 async def send_ws():   
     
-    print("buffer : ", buffer)
-    print("buffer.get_last_item() : ", buffer.get_last_item())
-    send_json = buffer.get_last_item()
+    result_str = ""
+    coords = buffer.get_coords()
+    #print("buffer.get_coords() : ", coords)
+    #async for
+    for key in coords:    
+        result_str += '(x, y) = ('+key+', '+ str(coords[key])+' )\n'    
+        
+    #print("#result_str = ")
     
-    if send_json is not None and len(send_json) > 0:
+    if result_str != "":
     
         # Websocket send
         async with websockets.connect("ws://172.16.1.106:9080/ws/chat/100/") as websocket:
-                        
-            await websocket.send(json.dumps(send_json))
-            result = await websocket.recv()
-            print("received data : ", result)
             
+            coord_json = { 'message': result_str }
+                        
+            await websocket.send(json.dumps(coord_json))
+            result = await websocket.recv()
+            
+            #print("received data : ", result)            
             buffer.flush()
 
 # faust -A StreamLogProcessor worker -l info --web-port 6068
@@ -111,11 +114,6 @@ async def send_ws():
 #    async for log in logs:        
 #       
 #        print("[INFLUXDB] log : ", log)
-         # Time conversion for influxDB
-         #tmp = '10/Nov/2021:08:59:34 +0900'
-         #tmp = log.time
-         #dt_datetime = datetime.strptime(tmp.split()[0],'%d/%b/%Y:%H:%M:%S')
-         #dt_datetime = dt_datetime.strftime("%Y-%m-%d %H:%M:%S")  
 #   
 #        # Making point for influxDB
 #        point = [
