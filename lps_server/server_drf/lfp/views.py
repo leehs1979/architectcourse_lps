@@ -42,7 +42,8 @@ class LogFileProcessorViewSet(viewsets.ModelViewSet):
         try:
             # 대용량 파일 파싱 테스트
             file_path = "/home/app/"
-            file_name = file_path + "HOM1-W-F11_SampleForTest.log"
+            #file_name = file_path + "HOM1-W-F11_SampleForTest.log"
+            file_name = file_path + "HOM1-W-F11_1GB.log"
             log_format = "%h %{X-Forwarded-For}i %l %u %v %t %r %>s %B %{Referer}i %{User-Agent}i %{JSESSIONID}C %a %{env}e %f %p %D"
             
              # 파싱
@@ -58,6 +59,8 @@ class LogFileProcessorViewSet(viewsets.ModelViewSet):
             #for filename in resultFiles:
             #    LogDetail_dynamic.objects.from_csv(filename, delimiter=',', encoding="utf-8")
 
+            print("Total Processing Time : %s sec" % (time.time() - start))
+            
             if settings.DEBUG:
                 logger.debug("To DB, Total Duration : %s sec" % (time.time() - start))
             
