@@ -107,27 +107,26 @@ async def send_ws():
             buffer.flush()
 
 # faust -A StreamLogProcessor worker -l info --web-port 6068
-# pipe and filter도 추가되어야 한다.
 ######################################################################
-#@app.agent(stream_log_topic)
-#async def log_to_influxdb(logs):
-#    async for log in logs:        
-#       
-#        print("[INFLUXDB] log : ", log)
-#   
-#        # Making point for influxDB
-#        point = [
-#            {
-#                'measurement': 'access',
-#                'tags': {'server_id': log.host}, 
-#                'fields': {'host': log.host, 'user': user, 'method': log.method, 
-#                        #'path': log.path, 
-#                        'code': log.code, 'size': log.size},
-#                'time': datetime.fromtimestamp(log.timestamp).strftime("%Y-%m-%d %H:%M:%S.%f")
-#            },
-#        ]
-#        
-#        # InfluxDB insert
-#        client.write_points(points=point, protocol='json')        
+@app.agent(stream_log_topic)
+async def log_to_influxdb(logs):
+    async for log in logs:        
+       
+        print("[INFLUXDB] log : ", log)
+   
+        # Making point for influxDB
+        point = [
+            {
+                'measurement': 'access',
+                'tags': {'server_id': log.host}, 
+                'fields': {'host': log.host, 'user': user, 'method': log.method, 
+                        #'path': log.path, 
+                        'code': log.code, 'size': log.size},
+                'time': datetime.fromtimestamp(log.timestamp).strftime("%Y-%m-%d %H:%M:%S.%f")
+            },
+        ]
+        
+        # InfluxDB insert
+        client.write_points(points=point, protocol='json')        
 
 # faust -A StreamLogProcessor worker -l info --web-port 6068
