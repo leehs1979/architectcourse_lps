@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: streamlog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: streamlog
+  template:
+    metadata:
+      labels:
+        app: streamlog
+    spec:
+      containers:
+      - name: streamlog
+        image: leehs1979/streamlog_processor:v3
+        ports:
+          - containerPort: 6068
+        resources:
+          requests:
+            cpu: "250m"
+          limits:
+            cpu: "500m"

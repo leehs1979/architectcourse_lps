@@ -127,3 +127,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+lps_server/server_drf/lfp/migrations/__init__.py
+lps_server/server_drf/lfp/migrations/0001_initial.py
